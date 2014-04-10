@@ -77,7 +77,7 @@ public class MainActivity extends FragmentActivity {
      * a geofence indefinitely, set the expiration time to
      * Geofence#NEVER_EXPIRE.
      */
-    private static final long GEOFENCE_EXPIRATION_IN_HOURS = 12;
+    private static final long GEOFENCE_EXPIRATION_IN_HOURS = 1;
     private static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
             GEOFENCE_EXPIRATION_IN_HOURS * DateUtils.HOUR_IN_MILLIS;
 
@@ -416,22 +416,7 @@ public class MainActivity extends FragmentActivity {
         }
 
         
-        /*
-         * USE IT WHEN ALLOWING ENTERING MANUALLY GEOFENCES-THEN UPDATE UI WITH THIS NEW GEOFENCE ACQUIRED
-        mUIGeofence1 = new SimpleGeofence(
-            "1",
-            // Get latitude, longitude, and radius from the UI
-            Double.valueOf(mLatitude1.getText().toString()),
-            Double.valueOf(mLongitude1.getText().toString()),
-            Float.valueOf(mRadius1.getText().toString()),
-            // Set the expiration time
-            GEOFENCE_EXPIRATION_IN_MILLISECONDS,
-            // Only detect entry transitions
-            Geofence.GEOFENCE_TRANSITION_ENTER);
-
-        // Store this flat version in SharedPreferences
-        mPrefs.setGeofence("1", mUIGeofence1);
-        */
+     
         //mCurrentGeofences.add(mUIGeofence1.toGeofence());    
         
         for(SimpleGeofence s:simpleGeofences){
@@ -450,8 +435,33 @@ public class MainActivity extends FragmentActivity {
         }
     }
     
+    public void onLoadGeofenceClicked(View v){
+    	
+    	if(!checkInputFields()){
+    		Log.e("onLoadGeofencesClicked", "incorrect input, try again");
+    		return;
+    	}
+    	
+    	//build SimpleGeofence
+    	String ID=mPrefs.getNewID();
+    	double lat1=Double.valueOf(mLatitude1.getText().toString());
+    	double long1=Double.valueOf(mLongitude1.getText().toString());
+    	float rad1=Float.valueOf(mRadius1.getText().toString());
+    	mUIGeofence=new SimpleGeofence(ID,lat1,long1,rad1,GEOFENCE_EXPIRATION_IN_MILLISECONDS,Geofence.GEOFENCE_TRANSITION_ENTER);
+    	
+    	//store SimpleGeofence in sharedPreferences
+    	mPrefs.setGeofence(ID, mUIGeofence);
+    	Log.d("onLoadGeofencesClicked", "Geofence with ID:"+ID+" is in DB");
+    	simpleGeofences.add(mUIGeofence);
+    	mCurrentGeofences.add(mUIGeofence.toGeofence());
+    	updateGeofencesInUI();
+    	v.setEnabled(false);
+    	Log.d("onLoadGeofencesClicked", "button disabled");
+    	
+    }
     
-    public void getCurrentLocationClick(View v){
+    
+    public void getCurrentLocationClicked(View v){
     	
     	LatLng currentLocation=mLocationRequester.getLocation();
     	Address currentAddress=mLocationRequester.getAddress();
@@ -463,6 +473,77 @@ public class MainActivity extends FragmentActivity {
     	//move the camera instantly to the current location and zoom
     	map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,15));
     			
+    }
+    
+    /*******************************CHECK INPUT VALUES*************************************/
+    
+    private boolean checkInputFields(){
+    	
+    	boolean inputOK=true;
+    	
+    	//check for empty fields
+    	
+    	if(TextUtils.isEmpty(mLatitude1.getText())){
+    		inputOK=false;
+    		mLatitude1.setBackgroundColor(Color.RED);
+    		Toast toast=Toast.makeText(this, R.string.geofence_input_error_missing, Toast.LENGTH_LONG);
+    		toast.show();
+    	}else{
+    		mLatitude1.setBackgroundColor(Color.BLACK);
+    	}
+    	if(TextUtils.isEmpty(mLongitude1.getText())){
+    		inputOK=false;
+    		mLongitude1.setBackgroundColor(Color.RED);
+    		Toast toast=Toast.makeText(this, R.string.geofence_input_error_missing, Toast.LENGTH_LONG);
+    		toast.show();
+    	}else{
+    		mLongitude1.setBackgroundColor(Color.BLACK);
+    	}
+    	if(TextUtils.isEmpty(mRadius1.getText())){
+    		inputOK=false;
+    		mRadius1.setBackgroundColor(Color.RED);
+    		Toast toast=Toast.makeText(this, R.string.geofence_input_error_missing, Toast.LENGTH_LONG);
+    		toast.show();
+    	}else{
+    		mRadius1.setBackgroundColor(Color.BLACK);
+    	}
+    	
+    	
+    	
+    	//test if input values are in the correct range
+    	
+    	double lat1=Double.valueOf(mLatitude1.getText().toString());
+    	double long1=Double.valueOf(mLongitude1.getText().toString());
+    	float rad1=Float.valueOf(mRadius1.getText().toString());
+    	
+    	if((lat1<GeofenceUtils.MIN_LATITUDE) || (lat1>GeofenceUtils.MAX_LATITUDE)){
+    		inputOK=false;
+    		mLatitude1.setBackgroundColor(Color.RED);
+    		Toast toast=Toast.makeText(this, R.string.geofence_input_error_latitude_invalid, Toast.LENGTH_LONG);
+    		toast.show();
+    	}else{
+    		mLatitude1.setBackgroundColor(Color.BLACK);
+    	}
+    	if((long1<GeofenceUtils.MIN_LONGITUDE) || (long1>GeofenceUtils.MAX_LONGITUDE)){
+    		inputOK=false;
+    		mLongitude1.setBackgroundColor(Color.RED);
+    		Toast toast=Toast.makeText(this, R.string.geofence_input_error_longitude_invalid, Toast.LENGTH_LONG);
+    		toast.show();
+    	}else{
+    		mLongitude1.setBackgroundColor(Color.BLACK);
+    	}
+    	if(rad1<GeofenceUtils.MIN_RADIUS){
+    		inputOK=false;
+    		mRadius1.setBackgroundColor(Color.RED);
+    		Toast toast=Toast.makeText(this, R.string.geofence_input_error_radius_invalid, Toast.LENGTH_LONG);
+    		toast.show();
+    	}else{
+    		mRadius1.setBackgroundColor(Color.BLACK);
+    	}
+    	
+    	
+    	
+    	return inputOK;
     }
     
 
@@ -516,7 +597,18 @@ public class MainActivity extends FragmentActivity {
          * @param intent The received broadcast Intent
          */
         private void handleGeofenceStatus(Context context, Intent intent) {
-
+        	String action = intent.getAction();
+        	
+        	if(TextUtils.equals(action, GeofenceUtils.ACTION_GEOFENCES_ADDED)){
+        		Toast toast=Toast.makeText(context, R.string.all_geofences_added, Toast.LENGTH_SHORT);
+        		Log.d("handleGeofenceStatus", "all geofences added");
+        		
+        	}else{ //geofences REMOVED
+        		mLatitude1.setText(GeofenceUtils.EMPTY_STRING);
+        		mLongitude1.setText(GeofenceUtils.EMPTY_STRING);
+        		mRadius1.setText(GeofenceUtils.EMPTY_STRING);
+        		mCurrentGeofencesText.setText(R.string.all_geofences_removed);
+        	}
         }
 
         /**

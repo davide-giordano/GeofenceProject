@@ -183,13 +183,22 @@ public class SimpleGeofenceStore {
                 geofence.getTransitionType());
         
         //store how many geofences objects we have in memory
-        nGeofences++;
+        nGeofences=getNGeofences()+1;
         editor.putInt(GeofenceUtils.KEY_NGEOFENCES,nGeofences);
         
 
         // Commit the changes
         editor.commit();
     }
+    
+    public String getNewID(){
+    	
+    	int newID=mPrefs.getInt(GeofenceUtils.KEY_NGEOFENCES, GeofenceUtils.INVALID_INT_VALUE)+1;
+    	Log.d("getNewID", "ID: "+Integer.toString(newID));
+    	return Integer.toString(newID);
+    }
+    
+    
 
     public void clearGeofence(String id) {
 
