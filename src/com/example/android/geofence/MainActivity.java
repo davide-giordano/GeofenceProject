@@ -115,6 +115,7 @@ public class MainActivity extends FragmentActivity {
     private TextView mCurrentGeofencesText;
     
     private SimpleGeofence mUIGeofence;
+    private SimpleGeofence mOfficeGeofence;
     private List<SimpleGeofence> simpleGeofences;
 
     /*
@@ -176,11 +177,23 @@ public class MainActivity extends FragmentActivity {
         mLongitude1 = (EditText) findViewById(R.id.value_longitude_1);
         mRadius1 = (EditText) findViewById(R.id.value_radius_1);
         
+        loadServerGeofences();
         
         mCurrentGeofencesText=(TextView)findViewById(R.id.current_geofences);
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
                 .getMap();
       
+    }
+    
+    private void loadServerGeofences(){
+    	
+    	String geofenceID=mPrefs.getNewID();
+    	double latitudeOffice=45.065288;
+    	double longitudeOffice=7.657679;
+    	float radiusOffice=100;
+    	
+    	mOfficeGeofence=new SimpleGeofence(geofenceID,latitudeOffice,longitudeOffice,radiusOffice,GEOFENCE_EXPIRATION_IN_MILLISECONDS,Geofence.GEOFENCE_TRANSITION_ENTER);
+    	mPrefs.setGeofence(geofenceID, mOfficeGeofence);
     }
     
     
@@ -216,7 +229,7 @@ public class MainActivity extends FragmentActivity {
 
 	private void updateGeofencesInUI(){
     	
-    	if(simpleGeofences!=null){
+    	if(simpleGeofences!=null && !simpleGeofences.isEmpty()){
     		mCurrentGeofencesText.setText(simpleGeofences.toString());//implement toString properly
     		
     	}
@@ -224,17 +237,7 @@ public class MainActivity extends FragmentActivity {
     	
     }
 
-    /*
-     * Save the current geofence settings in SharedPreferences.
-     */
-/*   			NOT YET ALLOWING USER TO INSERT MANUAL GEOFENCES 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mPrefs.setGeofence("1", mUIGeofence1);
-        mPrefs.setGeofence("2", mUIGeofence2);
-    }
- */
+
 
     /*
      * Handle results returned to this Activity by other Activities started with
