@@ -31,15 +31,19 @@
     <string name="menu_item_clear_all_geofences">Clear all geofences</string>
     <string name="menu_item_clear_geofence_history">Clear stored geofences</string>
     <string name="radius">Radius</string>
-    <string name="load_geofence">Load Geofence</string>
+    <string name="load_geofences">Load Geofences</string>
     <string name="start_geofencing">Start Geofencing</string>
 	<string name="stop_geofencing">Stop Geofencing</string>
 	<string name="current_geofences">Current Geofences</string>
 	<string name="no_geofences_in_list">No Geofences stored to load</string>
 	<string name="get_current_location">Display Current Location</string>
-	<string name="admin_insert_geofences">Manually insert Geofence - Admin</string>
+	<string name="admin_insert_geofences">Manually insert Geofence</string>
+	<string name="checkbox">Active</string>
+	<string name="clear_geofences">Clear Geofences</string>
+	
     
     <!-- Messages -->
+    <string name="geofence_loaded">Geofence Loaded</string>
     <string name="all_geofences_removed">Geofences Removed</string>
     <string name="all_geofences_added">Geofences Added</string>
     <string name="add_geofences_result_success">

@@ -118,7 +118,10 @@ public class SimpleGeofenceStore {
     
     public int getNGeofences(){
     	
-    	nGeofences=mPrefs.getInt(GeofenceUtils.KEY_NGEOFENCES, GeofenceUtils.INVALID_INT_VALUE);
+    	int provNGeofences=mPrefs.getInt(GeofenceUtils.KEY_NGEOFENCES, GeofenceUtils.INVALID_INT_VALUE);
+    	if(provNGeofences==GeofenceUtils.INVALID_INT_VALUE) {
+    		nGeofences=0;
+    	} else nGeofences=provNGeofences;
     	return nGeofences;
     }
     
@@ -160,7 +163,7 @@ public class SimpleGeofenceStore {
          * and non-concurrent
          */
         Editor editor = mPrefs.edit();
-
+        
         // Write the Geofence values to SharedPreferences
         editor.putFloat(
                 getGeofenceFieldKey(id, GeofenceUtils.KEY_LATITUDE),
@@ -193,7 +196,7 @@ public class SimpleGeofenceStore {
     
     public String getNewID(){
     	
-    	int newID=mPrefs.getInt(GeofenceUtils.KEY_NGEOFENCES, GeofenceUtils.INVALID_INT_VALUE)+1;
+    	int newID=getNGeofences()+1;
     	Log.d("getNewID", "ID: "+Integer.toString(newID));
     	return Integer.toString(newID);
     }
@@ -210,6 +213,18 @@ public class SimpleGeofenceStore {
         editor.remove(getGeofenceFieldKey(id, GeofenceUtils.KEY_EXPIRATION_DURATION));
         editor.remove(getGeofenceFieldKey(id, GeofenceUtils.KEY_TRANSITION_TYPE));
         editor.commit();
+    }
+    
+    public void clearStoredGeofences(){
+    	
+    	Editor editor=mPrefs.edit();
+    	editor.clear();
+    	editor.commit();
+    	
+    	nGeofences=0;
+    	editor.putInt(GeofenceUtils.KEY_NGEOFENCES,nGeofences);
+    	editor.commit();
+    	Log.d("clearStoredGeofences", "sharedPreferences successfully cleared");
     }
 
     /**

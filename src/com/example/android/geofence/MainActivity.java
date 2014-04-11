@@ -37,6 +37,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -110,6 +112,12 @@ public class MainActivity extends FragmentActivity {
     // Handle to geofence radius in the UI
     private EditText mRadius1;
     
+    private CheckBox mCheckBox;
+    private Button mStartButton;
+    private Button mStopButton;
+    private Button mLoadButton;
+    private Button mClearButton;
+    
     private GoogleMap map;
         
     private TextView mCurrentGeofencesText;
@@ -176,25 +184,23 @@ public class MainActivity extends FragmentActivity {
         mLatitude1 = (EditText) findViewById(R.id.value_latitude_1);
         mLongitude1 = (EditText) findViewById(R.id.value_longitude_1);
         mRadius1 = (EditText) findViewById(R.id.value_radius_1);
-        
-        loadServerGeofences();
-        
+        mCheckBox=(CheckBox)findViewById(R.id.insert_active_checkbox);
+        mStartButton=(Button)findViewById(R.id.register);
+        mStopButton=(Button)findViewById(R.id.unregister_by_pending_intent);
+        mLoadButton=(Button)findViewById(R.id.load_geofences);
+        mClearButton=(Button)findViewById(R.id.clear_geofences);
         mCurrentGeofencesText=(TextView)findViewById(R.id.current_geofences);
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
                 .getMap();
+        
+        //by default desabled
+        mStartButton.setEnabled(false);
+        mStopButton.setEnabled(false);
+        mClearButton.setEnabled(false);
       
     }
     
-    private void loadServerGeofences(){
-    	
-    	String geofenceID=mPrefs.getNewID();
-    	double latitudeOffice=45.065288;
-    	double longitudeOffice=7.657679;
-    	float radiusOffice=100;
-    	
-    	mOfficeGeofence=new SimpleGeofence(geofenceID,latitudeOffice,longitudeOffice,radiusOffice,GEOFENCE_EXPIRATION_IN_MILLISECONDS,Geofence.GEOFENCE_TRANSITION_ENTER);
-    	mPrefs.setGeofence(geofenceID, mOfficeGeofence);
-    }
+    
     
     
     @Override
@@ -227,17 +233,9 @@ public class MainActivity extends FragmentActivity {
 		super.onPause();
 	}
 
-	private void updateGeofencesInUI(){
-    	
-    	if(simpleGeofences!=null && !simpleGeofences.isEmpty()){
-    		mCurrentGeofencesText.setText(simpleGeofences.toString());//implement toString properly
-    		
-    	}
-    	else mCurrentGeofencesText.setText(R.string.no_geofences_in_list);
-    	
-    }
+	
 
-
+    /********************************************HANDLE SERVICES RELATED PROBLEMS****************************/
 
     /*
      * Handle results returned to this Activity by other Activities started with
@@ -348,7 +346,6 @@ public class MainActivity extends FragmentActivity {
     /**
      * Called when the user clicks the "STOP GEOFENCES" button
      *
-     * @param view The view that triggered this callback
      */
     public void onUnregisterByPendingIntentClicked(View view) {
         /*
@@ -397,7 +394,8 @@ public class MainActivity extends FragmentActivity {
     }
 
     
-   
+    //START GEOFENCING
+    
     public void onRegisterClicked(View view) {
 
         /*
@@ -418,10 +416,8 @@ public class MainActivity extends FragmentActivity {
             return;
         }
 
-        
-     
-        //mCurrentGeofences.add(mUIGeofence1.toGeofence());    
-        
+           
+        //add simpleGeofences to mCurrentGeofences
         for(SimpleGeofence s:simpleGeofences){
         	mCurrentGeofences.add(s.toGeofence());
         	Log.d("onRegisterClicked", "building geofences list");
@@ -438,32 +434,42 @@ public class MainActivity extends FragmentActivity {
         }
     }
     
-    public void onLoadGeofenceClicked(View v){
+    
+    //LOAD GEOFENCES
+    public void onLoadGeofencesClicked(View v){
     	
-    	if(!checkInputFields()){
-    		Log.e("onLoadGeofencesClicked", "incorrect input, try again");
-    		return;
+    	if(mCheckBox.isChecked()){ //User wants also to insert manually geofences
+    		
+    		if(!checkInputFields()){
+        		Log.e("onLoadGeofencesClicked", "incorrect input, try again");
+        		return;
+        	}
+        	
+        	//build SimpleGeofence
+        	String ID=mPrefs.getNewID();
+        	double lat1=Double.valueOf(mLatitude1.getText().toString());
+        	double long1=Double.valueOf(mLongitude1.getText().toString());
+        	float rad1=Float.valueOf(mRadius1.getText().toString());
+        	mUIGeofence=new SimpleGeofence(ID,lat1,long1,rad1,GEOFENCE_EXPIRATION_IN_MILLISECONDS,Geofence.GEOFENCE_TRANSITION_ENTER);
+        	
+        	//store SimpleGeofence in sharedPreferences
+        	mPrefs.setGeofence(ID, mUIGeofence);
+        	Log.d("onLoadGeofencesClicked", "Geofence with ID:"+ID+" is in DB");
+        	simpleGeofences.add(mUIGeofence);
+        	mCheckBox.setEnabled(false);
     	}
-    	
-    	//build SimpleGeofence
-    	String ID=mPrefs.getNewID();
-    	double lat1=Double.valueOf(mLatitude1.getText().toString());
-    	double long1=Double.valueOf(mLongitude1.getText().toString());
-    	float rad1=Float.valueOf(mRadius1.getText().toString());
-    	mUIGeofence=new SimpleGeofence(ID,lat1,long1,rad1,GEOFENCE_EXPIRATION_IN_MILLISECONDS,Geofence.GEOFENCE_TRANSITION_ENTER);
-    	
-    	//store SimpleGeofence in sharedPreferences
-    	mPrefs.setGeofence(ID, mUIGeofence);
-    	Log.d("onLoadGeofencesClicked", "Geofence with ID:"+ID+" is in DB");
-    	simpleGeofences.add(mUIGeofence);
-    	mCurrentGeofences.add(mUIGeofence.toGeofence());
+    		
+    	loadServerGeofences();
+    	Toast toast=Toast.makeText(this, R.string.geofence_loaded, Toast.LENGTH_LONG);
+    	toast.show();
     	updateGeofencesInUI();
-    	v.setEnabled(false);
-    	Log.d("onLoadGeofencesClicked", "button disabled");
+    	mLoadButton.setEnabled(false);
+    	mStartButton.setEnabled(true);
+    	Log.d("onLoadGeofencesClicked", "loading complete");
     	
     }
-    
-    
+       
+    //SHOW CURRENT LOCATION
     public void getCurrentLocationClicked(View v){
     	
     	LatLng currentLocation=mLocationRequester.getLocation();
@@ -476,6 +482,25 @@ public class MainActivity extends FragmentActivity {
     	//move the camera instantly to the current location and zoom
     	map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,15));
     			
+    }
+    
+    //CLEAR STORED GEOFENCES
+    public void onClearGeofencesClicked(View v){
+    	
+    	mPrefs.clearStoredGeofences();
+    	simpleGeofences.clear();
+    	updateGeofencesInUI();
+    	mLatitude1.setText(GeofenceUtils.EMPTY_STRING);
+    	mLongitude1.setText(GeofenceUtils.EMPTY_STRING);
+    	mRadius1.setText(GeofenceUtils.EMPTY_STRING);
+    	
+    	mStartButton.setEnabled(false);
+    	mLoadButton.setEnabled(true);
+    	mCheckBox.setEnabled(true);
+    	mCheckBox.setChecked(false);
+    	mClearButton.setEnabled(false);
+    	Log.d("onClearGeofencesClicked", "Geofences erased from storage-Load Re-Enabled");
+    	 	
     }
     
     /*******************************CHECK INPUT VALUES*************************************/
@@ -549,6 +574,30 @@ public class MainActivity extends FragmentActivity {
     	return inputOK;
     }
     
+    
+    /********************************OTHER METHODS*******************************************/
+    
+    private void updateGeofencesInUI(){
+    	
+    	if(simpleGeofences!=null && !simpleGeofences.isEmpty()){
+    		mCurrentGeofencesText.setText(simpleGeofences.toString());//implement toString properly
+    		
+    	}
+    	else mCurrentGeofencesText.setText(R.string.no_geofences_in_list);
+    	
+    }
+    
+    private void loadServerGeofences(){
+    	
+    	String geofenceID=mPrefs.getNewID();
+    	double latitudeOffice=45.065288;
+    	double longitudeOffice=7.657679;
+    	float radiusOffice=100;
+    	
+    	mOfficeGeofence=new SimpleGeofence(geofenceID,latitudeOffice,longitudeOffice,radiusOffice,GEOFENCE_EXPIRATION_IN_MILLISECONDS,Geofence.GEOFENCE_TRANSITION_ENTER);
+    	mPrefs.setGeofence(geofenceID, mOfficeGeofence);
+    	simpleGeofences.add(mOfficeGeofence);
+    }
 
     
     /*******************************INNER BROADCAST RECEIVER*********************************/
@@ -604,13 +653,19 @@ public class MainActivity extends FragmentActivity {
         	
         	if(TextUtils.equals(action, GeofenceUtils.ACTION_GEOFENCES_ADDED)){
         		Toast toast=Toast.makeText(context, R.string.all_geofences_added, Toast.LENGTH_SHORT);
+        		toast.show();
+        		mStartButton.setEnabled(false);
+        		mStopButton.setEnabled(true);
         		Log.d("handleGeofenceStatus", "all geofences added");
         		
+        		
         	}else{ //geofences REMOVED
-        		mLatitude1.setText(GeofenceUtils.EMPTY_STRING);
-        		mLongitude1.setText(GeofenceUtils.EMPTY_STRING);
-        		mRadius1.setText(GeofenceUtils.EMPTY_STRING);
-        		mCurrentGeofencesText.setText(R.string.all_geofences_removed);
+        		Toast toast=Toast.makeText(context, R.string.all_geofences_removed, Toast.LENGTH_SHORT);
+        		toast.show();
+        		mStartButton.setEnabled(true);
+        		mClearButton.setEnabled(true);
+        		mStopButton.setEnabled(false);
+        		mCurrentGeofences.clear();
         	}
         }
 

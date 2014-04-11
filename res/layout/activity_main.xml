@@ -30,12 +30,22 @@
             android:id="@+id/label_app_main_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:text="@string/admin_insert_geofences"
             android:textStyle="bold"
+            android:layout_alignBottom="@+id/insert_active_checkbox"
+            android:layout_centerHorizontal="true"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="5dp"/>
         
+        <CheckBox
+            android:id="@+id/insert_active_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/label_app_main_title"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/checkbox" />
         
         <TextView
             android:id="@+id/label_latitude_1"
@@ -97,9 +107,18 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/load_geofence"
-            android:layout_centerHorizontal="true"
-            android:onClick="onLoadGeofenceClicked" />
+            android:layout_alignBottom="@+id/clear_geofences"
+            android:text="@string/load_geofences"
+            android:onClick="onLoadGeofencesClicked" />
+        <Button
+            android:id="@+id/clear_geofences"
+            android:layout_below="@id/label_radius_1"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_toRightOf="@id/load_geofences"
+            android:text="@string/clear_geofences"
+            android:onClick="onClearGeofencesClicked" />
                 
         <Button
             android:id="@+id/register"
@@ -149,8 +168,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.MapFragment" />
-        
-        
 
     </RelativeLayout>
 
