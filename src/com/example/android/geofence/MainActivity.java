@@ -481,6 +481,7 @@ public class MainActivity extends FragmentActivity {
     															.snippet(addressText));
     	//move the camera instantly to the current location and zoom
     	map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,15));
+    	
     			
     }
     
@@ -592,7 +593,7 @@ public class MainActivity extends FragmentActivity {
     	String geofenceID=mPrefs.getNewID();
     	double latitudeOffice=45.065288;
     	double longitudeOffice=7.657679;
-    	float radiusOffice=100;
+    	float radiusOffice=50;
     	
     	mOfficeGeofence=new SimpleGeofence(geofenceID,latitudeOffice,longitudeOffice,radiusOffice,GEOFENCE_EXPIRATION_IN_MILLISECONDS,Geofence.GEOFENCE_TRANSITION_ENTER);
     	mPrefs.setGeofence(geofenceID, mOfficeGeofence);

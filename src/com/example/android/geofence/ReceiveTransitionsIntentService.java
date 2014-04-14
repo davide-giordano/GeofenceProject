@@ -38,7 +38,9 @@ public class ReceiveTransitionsIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        // Create a local broadcast Intent
+        
+    	Log.d("ReceiveTransitionIntentService", "onHandleIntent");
+    	// Create a local broadcast Intent
         Intent broadcastIntent = new Intent();
 
         // Give it the category for all intents sent by the Intent Service

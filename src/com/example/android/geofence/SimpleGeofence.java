@@ -139,6 +139,7 @@ public class SimpleGeofence {
                                getLongitude(),
                                getRadius())
                        .setExpirationDuration(mExpirationDuration)
+                       .setNotificationResponsiveness(5)
                        .build();
     }
 }

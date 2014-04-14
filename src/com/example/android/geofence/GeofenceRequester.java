@@ -50,6 +50,7 @@ public class GeofenceRequester
     // Stores the current instantiation of the location client
     private LocationClient mLocationClient;
 
+   
     /*
      * Flag that indicates whether an add or remove request is underway. Check this
      * flag before attempting to start a new request.
@@ -157,6 +158,7 @@ public class GeofenceRequester
 
         // Send a request to add the current geofences
         mLocationClient.addGeofences(mCurrentGeofences, mGeofencePendingIntent, this);
+        
     }
 
     /*
