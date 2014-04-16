@@ -118,9 +118,8 @@ public class SimpleGeofence {
     
     @Override
 	public String toString() {
-		return "ID=" + mId + ", Latitude=" + mLatitude
-				+ ", Longitude=" + mLongitude + ", Radius=" + mRadius
-				+ ", ExpirationDuration=" + mExpirationDuration;
+		return "Geofence ID=" + mId + ", Latitude=" + mLatitude
+				+ ", Longitude=" + mLongitude + ", Radius=" + mRadius;
 	}
 
 	/**
@@ -139,7 +138,6 @@ public class SimpleGeofence {
                                getLongitude(),
                                getRadius())
                        .setExpirationDuration(mExpirationDuration)
-                       .setNotificationResponsiveness(5)
                        .build();
     }
 }

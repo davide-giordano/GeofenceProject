@@ -12,16 +12,26 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.LatLng;
 
 public class LocationRequester implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
+	// Milliseconds per second
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    // Update frequency in seconds
+    public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+    // Update frequency in milliseconds
+    private static final long UPDATE_INTERVAL =
+            MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
+    
 	private LocationRequest mLocationRequest;
 	private LocationClient mLocationClient;
 	
@@ -35,6 +45,7 @@ public class LocationRequester implements GooglePlayServicesClient.ConnectionCal
 		
 		mLocationRequest=LocationRequest.create();
 		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+		mLocationRequest.setInterval(UPDATE_INTERVAL); //5 seconds
 		
 		mActivity=activityContext;
 		mLocationClient=new LocationClient(mActivity, this, this);
@@ -56,7 +67,7 @@ public class LocationRequester implements GooglePlayServicesClient.ConnectionCal
 	public Address getAddress(){
 		
 		if(mLocationClient==null){
-			Log.e("getLocation", "LocationClient not connected (is null)");
+			Log.e("getAddress", "LocationClient not connected (is null)");
 			return null;
 		}
 		
@@ -104,6 +115,28 @@ public class LocationRequester implements GooglePlayServicesClient.ConnectionCal
 	public void requestDisconnection(){
 		
 		getLocationClient().disconnect();
+	}
+	
+	public void startPeriodicUpdates(){
+		
+		if(mLocationClient==null){
+			Log.e("startPeriodicUpdates", "LocationClient not connected (is null)");
+			return;
+		}
+		
+		mLocationClient.requestLocationUpdates(mLocationRequest, (LocationListener) mActivity);
+		Log.d("startPeriodicUpdates", "periodic updates request");
+	}
+	
+	public void stopPeriodicUpdates(){
+		
+		if(mLocationClient==null){
+			Log.e("stopPeriodicUpdates", "LocationClient not connected (is null)");
+			return;
+		}
+		
+		mLocationClient.removeLocationUpdates((LocationListener) mActivity);
+		Log.d("stopPeriodicUpdates", "periodic updates stopped");
 	}
 	
 	

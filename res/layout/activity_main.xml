@@ -26,150 +26,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
         
-        <Button
-            android:id="@+id/get_current_location"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/get_current_location"
-            android:layout_centerHorizontal="true"
-            android:onClick="getCurrentLocationClicked"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp" />
-        
-        <fragment
+       <fragment
         	android:id="@+id/map"
-        	android:layout_below="@id/get_current_location"
         	android:layout_width="match_parent"
-        	android:layout_height="250dp"
-        	class="com.google.android.gms.maps.MapFragment" />
+        	android:layout_height="200dp"
+        	android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp" 
+        	class="com.google.android.gms.maps.MapFragment" />  
         
-        
-        <TextView
-            android:id="@+id/manually_insert_geofences"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <Button
+            android:id="@+id/manual_add"
             android:layout_below="@id/map"
-            android:text="@string/admin_insert_geofences"
-            android:textStyle="bold"
-            android:layout_marginBottom="5dp"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:layout_centerHorizontal="true"/>
-       
-        <CheckBox
-            android:id="@+id/insert_active_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/map"
-            android:layout_toRightOf="@id/manually_insert_geofences"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/checkbox" />
+            android:text="@string/admin_insert_geofences"
+            android:layout_centerHorizontal="true"
+            android:onClick="onManualAddClicked" />        
         
-        <TextView
-            android:id="@+id/label_latitude_1"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/manually_insert_geofences"
-            android:layout_alignTop="@+id/value_latitude_1"
-            android:text="@string/latitude"/>
-        <EditText
-            android:id="@+id/value_latitude_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="5dp"
-            android:layout_below="@id/manually_insert_geofences"
-            android:layout_toRightOf="@id/label_latitude_1"
-            android:inputType="numberDecimal|numberSigned" />
-        <TextView
-            android:id="@+id/label_longitude_1"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/label_latitude_1"
-            android:layout_alignTop="@+id/value_longitude_1"
-            android:text="@string/longitude"/>
-        <EditText
-            android:id="@+id/value_longitude_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/label_longitude_1"
-            android:layout_below="@id/value_latitude_1"
-            android:inputType="numberDecimal|numberSigned" />
-        <TextView
-            android:id="@+id/label_radius_1"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/label_longitude_1"
-            android:layout_alignTop="@+id/value_radius_1"
-            android:text="@string/radius"/>
-        <EditText
-            android:id="@+id/value_radius_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/value_longitude_1"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/label_radius_1"
-            android:inputType="numberDecimal" />
-		
-        
-        <!-- Register and unregister geofences buttons. -->
-        <Button
-            android:id="@+id/load_geofences"
-            android:layout_below="@id/label_radius_1"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_alignBottom="@+id/clear_geofences"
-            android:text="@string/load_geofences"
-            android:onClick="onLoadGeofencesClicked" />
-        <Button
-            android:id="@+id/clear_geofences"
-            android:layout_below="@id/label_radius_1"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_toRightOf="@id/load_geofences"
-            android:text="@string/clear_geofences"
-            android:onClick="onClearGeofencesClicked" />
-                
         <Button
             android:id="@+id/register"
-            android:layout_below="@id/load_geofences"
+            android:layout_below="@id/manual_add"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:text="@string/start_geofencing"
             android:layout_alignBottom="@+id/unregister_by_pending_intent"
             android:onClick="onRegisterClicked" />
         <Button
             android:id="@+id/unregister_by_pending_intent"
-            android:layout_below="@id/load_geofences"
+            android:layout_below="@id/manual_add"
             android:layout_toRightOf="@id/register"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:text="@string/stop_geofencing"
             android:onClick="onUnregisterByPendingIntentClicked" />
         <TextView
-            android:id="@+id/label_current_geofences"
+            android:id="@+id/label_active_geofences"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="@string/current_geofences"
+            android:text="@string/active_geofences"
             android:textStyle="bold"
             android:layout_below="@id/register"
             />
         <TextView
-            android:id="@+id/current_geofences"
-            android:layout_width="fill_parent"
+            android:id="@+id/active_geofences"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/label_current_geofences"
+            android:layout_below="@id/label_active_geofences"
             android:text="@string/no_geofences_in_list"/>
+        
+        
         
 
     </RelativeLayout>

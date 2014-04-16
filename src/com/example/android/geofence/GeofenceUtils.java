@@ -41,6 +41,9 @@ public final class GeofenceUtils {
 
     public static final String ACTION_GEOFENCES_ADDED =
             "com.example.android.geofence.ACTION_GEOFENCES_ADDED";
+    
+    public static final String ACTION_GEOFENCE_INSERTED=
+    		"com.example.android.geofence.ACTION_GEOFENCE_INSERTED";
 
     public static final String ACTION_GEOFENCES_REMOVED =
             "com.example.android.geofence.ACTION_GEOFENCES_DELETED";
@@ -70,6 +73,16 @@ public final class GeofenceUtils {
 
     public static final String EXTRA_GEOFENCE_STATUS =
             "com.example.android.geofence.EXTRA_GEOFENCE_STATUS";
+    
+    public static final String EXTRA_GEOFENCE_LATITUDE =
+            "com.example.android.geofence.EXTRA_GEOFENCE_LATITUDE";
+    
+    public static final String EXTRA_GEOFENCE_LONGITUDE =
+            "com.example.android.geofence.EXTRA_GEOFENCE_LONGITUDE";
+    
+    public static final String EXTRA_GEOFENCE_RADIUS =
+            "com.example.android.geofence.EXTRA_GEOFENCE_RADIUS";
+   
 
     /*
      * Keys for flattened geofences stored in SharedPreferences
@@ -87,7 +100,16 @@ public final class GeofenceUtils {
             "com.example.android.geofence.KEY_TRANSITION_TYPE";
     
     public static final String KEY_NGEOFENCES="com.example.android.geofence.KEY_NGEOFENCES";
-
+    
+    public static final String KEY_LOAD_BUTTON="com.example.android.geofence.KEY_LOAD_BUTTON";
+    public static final String KEY_REFRESH_BUTTON="com.example.android.geofence.KEY_REFRESH_BUTTON";
+    public static final String KEY_CLEAR_BUTTON="com.example.android.geofence.KEY_CLEAR_BUTTON";
+    public static final String KEY_START_BUTTON="com.example.android.geofence.KEY_START_BUTTON";
+    public static final String KEY_STOP_BUTTON="com.example.android.geofence.KEY_STOP_BUTTON";
+    public static final String KEY_MANUAL_ADD_BUTTON="com.example.android.geofence.KEY_MANUAL_ADD_BUTTON";
+    public static final String KEY_CHECKBOX="com.example.android.geofence.KEY_CHECKBOX";
+    public static final String KEY_NEW_GEOFENCE="com.example.android.geofence.KEY_NEW_GEOFENCE";
+    
     // The prefix for flattened geofence keys
     public static final String KEY_PREFIX =
             "com.example.android.geofence.KEY";
@@ -98,6 +120,8 @@ public final class GeofenceUtils {
     public static final float INVALID_FLOAT_VALUE = -999.0f;
 
     public static final int INVALID_INT_VALUE = -999;
+    
+    public static final double INVALID_DOUBLE_VALUE=-999.0d;
 
     /*
      * Constants used in verifying the correctness of input values

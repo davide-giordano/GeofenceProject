@@ -120,6 +120,7 @@ public class ReceiveTransitionsIntentService extends IntentService {
         // Create an explicit content Intent that starts the main Activity
         Intent notificationIntent =
                 new Intent(getApplicationContext(),MainActivity.class);
+        //notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         // Construct a task stack
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -152,6 +153,33 @@ public class ReceiveTransitionsIntentService extends IntentService {
         // Issue the notification
         mNotificationManager.notify(0, builder.build());
     }
+    
+    /*private void sendNotification(String transitionType,String ids){
+    	
+    	Intent resultIntent=new Intent(this,MainActivity.class);
+    	resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    	
+    	NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+    	builder.setSmallIcon(R.drawable.ic_notification)
+        	   .setContentTitle(
+        			   				getString(R.string.geofence_transition_notification_title,
+        			   			    transitionType, ids))
+        	   .setContentText(getString(R.string.geofence_transition_notification_text));
+    	
+    	// Construct a task stack
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+
+        // Adds the main Activity to the task stack as the parent
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        
+        PendingIntent resultPendingIntent=PendingIntent.getActivity(this, 0, resultIntent,0);
+        builder.setContentIntent(resultPendingIntent);
+        
+        NotificationManager mNotificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, builder.build());
+    	
+    }*/
 
     /**
      * Maps geofence transition types to their human-readable equivalents.
