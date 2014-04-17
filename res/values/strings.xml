@@ -25,6 +25,7 @@
     <string name="app_title">Geofence and Location Monitoring</string>
     <string name="geofence1">Geofence 1</string>
     <string name="geofence2">Geofence 2</string>
+    <string name="geofence">Geofence</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="menu_item_clear_geofence1">Clear geofence 1</string>
@@ -44,6 +45,8 @@
     <string name="clear_geofences">Clear Geofences</string>
     <string name="refresh_geofences">Refresh Geofences</string>
     <string name="add_geofence">Add Geofence</string>
+    <string name="geofence_id">GeofenceID</string>
+    <string name="geofence_description">Geofence Description</string>
 
     <!-- Messages -->
     <string name="geofence_loaded">Geofence Loaded</string>

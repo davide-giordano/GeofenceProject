@@ -38,9 +38,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -106,17 +108,20 @@ public class MainActivity extends FragmentActivity implements com.google.android
     private Button mStartButton;
     private Button mStopButton;
     private Button mManualAddButton;
+    private ListView mActiveGeofencesList;
+    private MyGeofencesArrayAdapter mGeofencesAdapter;
     
     private boolean newGeofence;
     
     
     private GoogleMap map;
         
-    private TextView mActiveGeofencesText;
     
     private SimpleGeofence mUIGeofence;
     private SimpleGeofence mOfficeGeofence;
     private List<SimpleGeofence> simpleGeofences;
+    private List<SimpleGeofence> activeGeofences;
+    
     
     private ButtonsStateStore mButtonState;
 
@@ -153,7 +158,10 @@ public class MainActivity extends FragmentActivity implements com.google.android
         
         //Action for receiving geofence data manually inserted
         mIntentFilter.addAction(GeofenceUtils.ACTION_GEOFENCE_INSERTED);
-
+        
+        //Action for successful connection from LocationRequester (needed to abilitate periodic updates)
+        mIntentFilter.addAction(GeofenceUtils.ACTION_CONNECTION_SUCCESS);
+        
         // All Location Services sample apps use this category
         mIntentFilter.addCategory(GeofenceUtils.CATEGORY_LOCATION_SERVICES);
 
@@ -163,7 +171,8 @@ public class MainActivity extends FragmentActivity implements com.google.android
         // Instantiate the current List of geofences
         mGeofencesToAdd=new ArrayList<Geofence>();
         
-        simpleGeofences=new LinkedList<SimpleGeofence>();
+        simpleGeofences=new ArrayList<SimpleGeofence>();
+        activeGeofences=new ArrayList<SimpleGeofence>();
 
         // Instantiate a Geofence requester
         mGeofenceRequester = new GeofenceRequester(this);
@@ -183,9 +192,15 @@ public class MainActivity extends FragmentActivity implements com.google.android
         mStartButton=(Button)findViewById(R.id.register);
         mStopButton=(Button)findViewById(R.id.unregister_by_pending_intent);
         mManualAddButton=(Button)findViewById(R.id.manual_add);
-        mActiveGeofencesText=(TextView)findViewById(R.id.active_geofences);
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
                 .getMap();
+        
+    	
+        mActiveGeofencesList=(ListView)findViewById(R.id.active_geofences_list);
+        mGeofencesAdapter=new MyGeofencesArrayAdapter(this,R.layout.list_element,activeGeofences);
+        mActiveGeofencesList.setAdapter(mGeofencesAdapter);
+
+        
         
         newGeofence=true;
         
@@ -198,6 +213,9 @@ public class MainActivity extends FragmentActivity implements com.google.android
         mPrefs.clearStoredGeofences();
         loadServerGeofences();
         
+        // Register the broadcast receiver to receive status updates
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, mIntentFilter);
+        
       
     }
     
@@ -205,8 +223,7 @@ public class MainActivity extends FragmentActivity implements com.google.android
     @Override
     protected void onResume() {
         super.onResume();
-        // Register the broadcast receiver to receive status updates
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, mIntentFilter);
+        
         /*
          * Get existing geofences from the latitude, longitude, and
          * radius values stored in SharedPreferences. If no values
@@ -216,7 +233,7 @@ public class MainActivity extends FragmentActivity implements com.google.android
         logStoredGeofences();
         if(servicesConnected()){
         	mLocationRequester.requestConnection();
-        	mLocationRequester.startPeriodicUpdates();
+        	//mLocationRequester.startPeriodicUpdates();
         }else{
         	Log.e("onResume", "services not connected!");
         }
@@ -456,13 +473,6 @@ public class MainActivity extends FragmentActivity implements com.google.android
     
     /********************************OTHER METHODS*******************************************/
 
-    private void showActiveGeofencesUI(){
-    	
-    	if(simpleGeofences!=null && !simpleGeofences.isEmpty()){
-    		mActiveGeofencesText.setText(simpleGeofences.toString());
-    	}
-    	else mActiveGeofencesText.setText(R.string.no_geofences_in_list);
-    }
     
     private void logStoredGeofences(){
     	
@@ -495,8 +505,9 @@ public class MainActivity extends FragmentActivity implements com.google.android
     	mButtonState.setButtonState(GeofenceUtils.KEY_START_BUTTON,mStartButton.isEnabled());
     	mButtonState.setButtonState(GeofenceUtils.KEY_STOP_BUTTON,mStopButton.isEnabled());
     	mButtonState.setButtonState(GeofenceUtils.KEY_MANUAL_ADD_BUTTON, mManualAddButton.isEnabled());
-    	mButtonState.setButtonState(GeofenceUtils.KEY_NEW_GEOFENCE, newGeofence);
+    	//mButtonState.setButtonState(GeofenceUtils.KEY_NEW_GEOFENCE, newGeofence);
     	
+    	Log.d("saveButtonStates", "saving button states");
     }
     
     private void resumeButtonStates(){
@@ -506,8 +517,8 @@ public class MainActivity extends FragmentActivity implements com.google.android
     	mStartButton.setEnabled(mButtonState.getButtonState(GeofenceUtils.KEY_START_BUTTON));
     	mStopButton.setEnabled(mButtonState.getButtonState(GeofenceUtils.KEY_STOP_BUTTON));
     	mManualAddButton.setEnabled(mButtonState.getButtonState(GeofenceUtils.KEY_MANUAL_ADD_BUTTON));
-    	newGeofence=mButtonState.getButtonState(GeofenceUtils.KEY_NEW_GEOFENCE);
-    	
+    	//newGeofence=mButtonState.getButtonState(GeofenceUtils.KEY_NEW_GEOFENCE);
+    	Log.d("resumeButtonStates", "resuming button states");
     }
     
 
@@ -559,7 +570,11 @@ public class MainActivity extends FragmentActivity implements com.google.android
             } else if(TextUtils.equals(action, GeofenceUtils.ACTION_GEOFENCE_INSERTED)){
             	
             	handleGeofenceManualAdd(context,intent);
-            }            
+            } 
+            else if(TextUtils.equals(action,GeofenceUtils.ACTION_CONNECTION_SUCCESS)){
+            	
+            	handleConnectionSuccess(context,intent);
+            }
             else {
                 Log.e(GeofenceUtils.APPTAG, getString(R.string.invalid_action_detail, action));
                 Toast.makeText(context, R.string.invalid_action, Toast.LENGTH_LONG).show();
@@ -578,7 +593,12 @@ public class MainActivity extends FragmentActivity implements com.google.android
         		mStopButton.setEnabled(true);
         		newGeofence=false;
         		mGeofencesToAdd.clear();
-        		showActiveGeofencesUI();
+        		
+        		for(SimpleGeofence s: simpleGeofences){
+        			activeGeofences.add(s);
+        		}
+        		mGeofencesAdapter.clear();
+        		mActiveGeofencesList.invalidateViews();
         		Log.d("handleGeofenceStatus", "all geofences added");
         		
         		
@@ -586,8 +606,10 @@ public class MainActivity extends FragmentActivity implements com.google.android
         		Toast toast=Toast.makeText(context, R.string.all_geofences_removed, Toast.LENGTH_SHORT);
         		toast.show();
         		//erase active geofences
-        		mActiveGeofencesText.setText(R.string.no_geofences_in_list);
+        		activeGeofences.clear();
+        		mActiveGeofencesList.invalidateViews();
         		mStopButton.setEnabled(false);
+        		newGeofence=true;
         		
         	}
         }
@@ -611,8 +633,15 @@ public class MainActivity extends FragmentActivity implements com.google.android
         		Log.d("handleGeofenceManualAdd", "Geofence with ID:"+ID);
         		simpleGeofences.add(mUIGeofence);
         		newGeofence=true;
+        		Log.d("handleGeofenceManualAdd", "setting newGeofence true");
         		logStoredGeofences();
         	}
+        }
+        
+        private void handleConnectionSuccess(Context context,Intent intent){
+        	
+        	//doing it here because before we need that asynchronous method onConnected is called
+        	mLocationRequester.startPeriodicUpdates();
         }
 
         /**

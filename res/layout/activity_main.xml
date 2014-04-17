@@ -15,16 +15,14 @@
   limitations under the License.
 -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="5dp"
     tools:context=".MainActivity" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+
         
        <fragment
         	android:id="@+id/map"
@@ -71,16 +69,17 @@
             android:textStyle="bold"
             android:layout_below="@id/register"
             />
-        <TextView
-            android:id="@+id/active_geofences"
-            android:layout_width="wrap_content"
+
+        <ListView
+            android:id="@+id/active_geofences_list"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/label_active_geofences"
-            android:text="@string/no_geofences_in_list"/>
-        
-        
-        
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="29dp" >
+        </ListView>
 
-    </RelativeLayout>
+</RelativeLayout>
 
-</ScrollView>
+

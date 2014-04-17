@@ -168,6 +168,12 @@ public class LocationRequester implements GooglePlayServicesClient.ConnectionCal
 		
 		Log.d("onConnected-LocationRequester", "LocationClient connected");
 		
+		Intent broadcastIntent=new Intent();
+		
+		broadcastIntent.setAction(GeofenceUtils.ACTION_CONNECTION_SUCCESS)
+					   .addCategory(GeofenceUtils.CATEGORY_LOCATION_SERVICES);
+		LocalBroadcastManager.getInstance(mActivity).sendBroadcast(broadcastIntent);
+		
 	}
 
 	@Override
@@ -175,6 +181,7 @@ public class LocationRequester implements GooglePlayServicesClient.ConnectionCal
 		
 		Log.d("onDisconnected-LocationRequester", "LocationClient disconnected");
 		mLocationClient=null;
+		
 		
 	}
 	
