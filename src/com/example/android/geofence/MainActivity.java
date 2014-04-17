@@ -27,7 +27,9 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings.System;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
@@ -229,6 +231,8 @@ public class MainActivity extends FragmentActivity implements com.google.android
          * radius values stored in SharedPreferences. If no values
          * exist, null is returned.
          */
+        
+        
         simpleGeofences=mPrefs.getGeofences();
         logStoredGeofences();
         if(servicesConnected()){
@@ -593,11 +597,10 @@ public class MainActivity extends FragmentActivity implements com.google.android
         		mStopButton.setEnabled(true);
         		newGeofence=false;
         		mGeofencesToAdd.clear();
-        		
+        		mGeofencesAdapter.clear();
         		for(SimpleGeofence s: simpleGeofences){
         			activeGeofences.add(s);
         		}
-        		mGeofencesAdapter.clear();
         		mActiveGeofencesList.invalidateViews();
         		Log.d("handleGeofenceStatus", "all geofences added");
         		
@@ -641,6 +644,18 @@ public class MainActivity extends FragmentActivity implements com.google.android
         private void handleConnectionSuccess(Context context,Intent intent){
         	
         	//doing it here because before we need that asynchronous method onConnected is called
+        	 LocationManager mlocManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);;
+             boolean enabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+             if(enabled) {
+            	 Toast toast=Toast.makeText(context, "gps enabled", Toast.LENGTH_LONG);
+         		toast.show();
+             }
+             else{
+            	 Toast toast=Toast.makeText(context, "no gps", Toast.LENGTH_LONG);
+          		toast.show();
+          		
+             }
+             
         	mLocationRequester.startPeriodicUpdates();
         }
 
