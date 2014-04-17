@@ -47,6 +47,7 @@
     <string name="add_geofence">Add Geofence</string>
     <string name="geofence_id">GeofenceID</string>
     <string name="geofence_description">Geofence Description</string>
+    <string name="current_location">Current Location</string>
 
     <!-- Messages -->
     <string name="geofence_loaded">Geofence Loaded</string>
